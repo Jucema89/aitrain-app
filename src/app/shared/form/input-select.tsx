@@ -19,9 +19,9 @@ export default function InputSelect (data: InpuSelectProps) {
 
             <select id={data.id} className={data.errorMessage != '' ? errorClass : normalClass} 
             {...data.registerZod(data.id)}>
-                <option selected>Select a Service</option>
+                <option selected>Select one Option</option>
                 { data.options.map((option, i) => (
-                    <option key={i}> {option} </option>
+                    <option key={i} value={option.value}> {option.label} </option>
                 ))}
                
             </select>

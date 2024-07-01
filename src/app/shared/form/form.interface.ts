@@ -14,10 +14,13 @@ export interface InpuSelectProps {
     label: string
     name: string
     placeholder: string
-    options: string[]
+    options: {
+        label: string
+        value: string
+    }[]
     registerZod: any
-    errorMessage: string
-    require: boolean
+    errorMessage?: string
+    require?: boolean
 }
 
 export interface InputNumberProps {
