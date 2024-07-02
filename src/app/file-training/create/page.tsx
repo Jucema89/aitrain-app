@@ -1,11 +1,50 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 import * as z from 'zod';
+import { useGetModelsMutation } from '@/app/redux/service/openaiApi';
+import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod'
 import InputText from '@/app/shared/form/input-text';
 import InputSelect from '@/app/shared/form/input-select';
+import { useEffect, useState } from 'react';
+import { ModelsOpenAI, OpenAiModelsResponse } from '../file-training.interface';
+import { addModels } from '@/app/redux/features/openaiModels.slice';
+import Dropzone from '@/app/shared/components/dropzone/dropzone.component';
 
 export default function CreateFileTraining(){
+
+    const urlBack= `${process.env.NEXT_PUBLIC_API_URL}`;
+    const [files, setFiles] = useState<File[]>([]);
+
+    const models = useAppSelector(state => state.openAIModelsReducer.models)
+    const dispatch = useAppDispatch()
+   
+
+    const [getModels, { data: modelsAI, isLoading, isSuccess, isError, error }] = useGetModelsMutation();
+
+    useEffect(() => {
+      getModels('');
+      if(isSuccess){
+        dispatch(addModels(modelsAI.data))
+      }
+      
+    }, []);
+
+    const formatModels = () => {
+      console.log('arrayModels in function -= ', models)
+      const optionModels: {label: string, value: string}[] = []
+      models.forEach((model) => {
+        if(model.id.includes('gpt-')){
+          optionModels.push({
+            label: model.id,
+            value: model.id
+          })
+        }
+      })
+
+      return optionModels
+    }
 
     const requiredString = {
       required_error: "Este campo es Requerido",
@@ -62,48 +101,100 @@ export default function CreateFileTraining(){
 
   function submitForm(event: any) {
     console.log('event form ', event )
-    const form = new FormData();
-    form.append('nombres', event.nombres);
-    form.append('apellidos', event.apellidos);
-    form.append('cedula', event.cedula);
-    form.append('nombreEmpresa', event.nombreEmpresa);
-    form.append('nit', event.nit);
-    form.append('celular', event.celular);
-    form.append('telefono', event.telefono);
-    form.append('direccion', event.direccion);
-    form.append('ciudad', event.ciudad);
-    form.append('departamento', event.departamento);
-    form.append('email', event.email);
+    // const form = new FormData();
+    // form.append('nombres', event.nombres);
+    // form.append('apellidos', event.apellidos);
+    // form.append('cedula', event.cedula);
+    // form.append('nombreEmpresa', event.nombreEmpresa);
+    // form.append('nit', event.nit);
+    // form.append('celular', event.celular);
+    // form.append('telefono', event.telefono);
+    // form.append('direccion', event.direccion);
+    // form.append('ciudad', event.ciudad);
+    // form.append('departamento', event.departamento);
+    // form.append('email', event.email);
 
-    form.append('vendeExcel', event.vendeExcel);
-    form.append('outsourcing', event.outsourcing);
-    form.append('especialista', event.especialista);
-    form.append('docente', event.docente);
-    form.append('representaCentroEducativo', event.representaCentroEducativo);
-    form.append('estaNegocio', event.estaNegocio);
+    // form.append('vendeExcel', event.vendeExcel);
+    // form.append('outsourcing', event.outsourcing);
+    // form.append('especialista', event.especialista);
+    // form.append('docente', event.docente);
+    // form.append('representaCentroEducativo', event.representaCentroEducativo);
+    // form.append('estaNegocio', event.estaNegocio);
 
-    form.append('nroExcel', event.nroExcel);
-    form.append('nroClientes', event.nroClientes);
-    form.append('enteroColduty', event.enteroColduty);
+    // form.append('nroExcel', event.nroExcel);
+    // form.append('nroClientes', event.nroClientes);
+    // form.append('enteroColduty', event.enteroColduty);
 
     //sendData
 
 }
 
-    return(
-        <div className="max-w-[85rem] px-4 py-4 sm:px-6 lg:px-8 lg:py-4 mx-auto">
+if(isLoading){
+  return(
+    <div className="max-w-[85rem] px-4 py-4 sm:px-6 lg:px-8 lg:py-4 mx-auto grid md:grid-cols-2 items-center gap-12">
 
-    <div className="mx-auto max-w-2xl">
+      <div className="h-auto w-full bg-gray-100">
+        <div className="h-full w-full animate-pulse">
+          <p className="h-40 w-full bg-gray-100 border-dashed border-2 border-gray-200 rounded-md dark:bg-neutral-700"></p>
+        </div>
+
+        <div className="mt-4 h-full w-full animate-pulse">
+          <p className="h-8 w-full bg-gray-200 rounded-md dark:bg-neutral-700"></p>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-2xl">
       <div className="mt-5 p-4 relative bg-white border rounded-xl sm:mt-10 md:p-10 dark:bg-neutral-900 dark:border-neutral-700">
-
+  
         <p className="text-2xl text-gray-800 pb-2 font-bold sm:text-2xl dark:text-white">
           Crear Archivos de Entrenamiento
         </p>
+  
+        <div>
+        {
+          [1, 2, 3, 4].map((item) => (
+            <div key={item} className="my-4 h-full w-full animate-pulse">
+              <p className="h-8 w-full bg-gray-200 rounded-md dark:bg-neutral-700"></p>
+          </div>
+          ))
+        }
 
+        <div className="mt-6 grid">
+          <button type="submit" className="animate-pulse w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-gray-200 text-gray-500 disabled:opacity-50 disabled:pointer-events-none">
+            await Data
+          </button>
+        </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  )
+} else {
+  return(
+    <div className="max-w-[85rem] px-4 py-4 sm:px-6 lg:px-8 lg:py-4 mx-auto grid md:grid-cols-2 items-center gap-12">
+      <Dropzone addFileToForm={setFiles} />
+      <div className="mx-auto max-w-2xl">
+      <div className="mt-5 p-4 relative bg-white border rounded-xl sm:mt-10 md:p-10 dark:bg-neutral-900 dark:border-neutral-700">
+  
+        <p className="text-2xl text-gray-800 pb-2 font-bold sm:text-2xl dark:text-white">
+          Crear Archivos de Entrenamiento
+        </p>
+  
         <form  onSubmit={handleSubmit(submitForm)}>
-
+  
+        < InputSelect
+          label="AI Model that will generate the Documents" 
+          placeholder="Select an option"
+          id="modelGeneratorData"
+          name="modelGeneratorData"
+          options={isSuccess ? formatModels() : []}
+          registerZod={register}
+          errorMessage={errors.modelGeneratorData ? errors.modelGeneratorData?.message : ''}
+          require={true}
+        />
+  
         <InputText 
-          label="Name" 
+          label="File name to create" 
           placeholder="Chat for clients" 
           id="name" 
           name="name" 
@@ -112,7 +203,7 @@ export default function CreateFileTraining(){
           errorMessage={errors.name ? errors.name?.message: ''}
           require={true}
         />
-
+  
         < InputSelect
           label="Type of responses you want to get" 
           placeholder="Select an option"
@@ -123,7 +214,7 @@ export default function CreateFileTraining(){
           errorMessage={errors.type_answer ? errors.type_answer?.message : ''}
           require={true}
         />
-
+  
         <InputText 
           label="System Role for AI" 
           placeholder="You are a salesperson, you advise people and companies on how to insure their possessions and people, you are attentive and very friendly."
@@ -134,53 +225,6 @@ export default function CreateFileTraining(){
           errorMessage={errors.role_system ? errors.role_system?.message: ''}
           require={true}
         />
-
-          {/* <app-input 
-            [control]="'modelGeneratorData'" 
-            [inputType]="'text'" 
-            [label]="'Modelo de AI que generará los Documentos'"
-            [tooltip]="'
-            Para mejores resultados recomendamos usar los Últimos modelos lanzados.'"
-            [type]="'select'" 
-            [formGroup]="formTrain"
-            [selectOption]="(optionsModelGenerator$ | async) || []"
-            [errorMessage]="'Este modelo de AI esta mal.'">
-          </app-input>
-          <small className="text-gray-500">Este modelo sera quien tomara tus documentos y creara los archivos <b>.jsonl</b> que despues podras usar para entrenar un modelo.</small>
-          <app-input 
-            [control]="'name'" 
-            [inputType]="'text'"
-            [placeholder]="'Bot de venta'"
-            [label]="'Nombre del Archivo a crear'"
-            [type]="'text'" 
-            [formGroup]="formTrain" 
-            [errorMessage]="'El Nombre esta mal'">
-          </app-input>
-
-          <app-input 
-            [control]="'type_answer'" 
-            [inputType]="'text'" 
-            [label]="'Tipo de respuestas que deseas obtener'"
-            [tooltip]="'
-            Segun este tipo de respuesta el modelo aprendera como debe contestar, si sera mas explicativo o sera más corto en sus respuestas.'"
-            [type]="'select'" 
-            [formGroup]="formTrain"
-            [selectOption]="optionsAnswer"
-            [errorMessage]="'El tipo de respuesta esta mal'">
-          </app-input>
-
-
-          <app-input 
-            [control]="'role_system'" 
-            [inputType]="'text'" 
-            [label]="'Rol de Sistema para la IA'"
-            [type]="'textarea'"
-            [tooltip]="'Rol que debera tomar la IA al recibir el entrenamiento, decirle que es un vendedor, asesor, docente o cualquier rol que se requiera.'" 
-            [formGroup]="formTrain"
-            [placeholder]="'Eres un vendedor de seguros, asesoras personas y empresas sobre como asegurar sus posesiones y personas, eres atento  muy amable.'"
-            [errorMessage]="'Este Rol del Sistema esta mal'">
-          </app-input> */}
-
           <div className="mt-6 grid">
             <button type="submit" className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
               Crear Archivos
@@ -188,9 +232,11 @@ export default function CreateFileTraining(){
           </div>
         </form>
       </div>
+      </div>
     </div>
-  </div>
+  )
+}
 
-    )
+   
 
 }

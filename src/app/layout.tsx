@@ -5,7 +5,8 @@ import "./globals.css";
 import PrelineScript from "./shared/components/PrelineScript";
 import { SvgAitrainLogoPC, SvgAitrainLogoPhone } from "../../public/svg";
 import Navigation from "./shared/components/navigation/navigation";
-import Header from "./shared/components/header";
+import Header from "./shared/components/header.component";
+import StoreProvider from "./StoreProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,7 +27,7 @@ export default function RootLayout({
         <Navigation />
         <div className="w-full lg:ps-64">
           <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-              { children }
+            <StoreProvider>{ children }</StoreProvider>
           </div>
         </div>
       </body>
