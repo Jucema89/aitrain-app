@@ -1,15 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { useGetModelsMutation } from "../service/openaiApi";
-
-interface ModelOpenAI {
-    created: number;
-    id: string;
-    object: string;
-    owned_by: string;
-}
-
+import { OpenAIModel } from "../interfaces/openai.interfaces";
 interface OpenaiModelsState {
-    models: ModelOpenAI[];
+    models: OpenAIModel[];
 }
 
 const initialState: OpenaiModelsState = {
@@ -21,7 +14,7 @@ export const openaiModelsSlice = createSlice({
     initialState,
     reducers: {
         addModels: (state, action) => {
-            action.payload.forEach((model: ModelOpenAI) => {
+            action.payload.forEach((model: OpenAIModel) => {
                 state.models.push(model)
             })
         },

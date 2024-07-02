@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 import * as z from 'zod';
+import dynamic from 'next/dynamic';
 import { useGetModelsMutation } from '@/app/redux/service/openaiApi';
 import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -8,33 +9,52 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import InputText from '@/app/shared/form/input-text';
 import InputSelect from '@/app/shared/form/input-select';
 import { useEffect, useState } from 'react';
-import { ModelsOpenAI, OpenAiModelsResponse } from '../file-training.interface';
 import { addModels } from '@/app/redux/features/openaiModels.slice';
 import Dropzone from '@/app/shared/components/dropzone/dropzone.component';
+import InputTextarea from '@/app/shared/form/input-textarea';
+import { OpenAIModel } from '@/app/redux/interfaces/openai.interfaces';
+import { useCreateTrainMutation } from '@/app/redux/service/aitrainApi';
+import HSOverlay from '@preline/overlay';
+const ModalNotification = dynamic(() => import('@/app/shared/components/notificacion'), {
+  ssr: false
+})
+import { ModalNotificationData } from '@/app/shared/components/notificacion';
+
 
 export default function CreateFileTraining(){
-
-    const urlBack= `${process.env.NEXT_PUBLIC_API_URL}`;
+    const dispatch = useAppDispatch()
     const [files, setFiles] = useState<File[]>([]);
+    const [notification, setNotification] = useState<ModalNotificationData>({ open: false, type: 'success', data: { title: '', message: '' }})
 
     const models = useAppSelector(state => state.openAIModelsReducer.models)
-    const dispatch = useAppDispatch()
-   
 
     const [getModels, { data: modelsAI, isLoading, isSuccess, isError, error }] = useGetModelsMutation();
 
+    const [createTrain, { data: TrainCreated }] = useCreateTrainMutation()
+
     useEffect(() => {
-      getModels('');
-      if(isSuccess){
+      getModels();
+      if(!isLoading && isSuccess){
         dispatch(addModels(modelsAI.data))
       }
-      
     }, []);
 
-    const formatModels = () => {
-      console.log('arrayModels in function -= ', models)
+    //Effect after send Form create training
+    useEffect(() => {
+      console.log('me ejecute en TrainCreated = ', TrainCreated)
+
+      if (typeof window !== "undefined" && modelsAI && TrainCreated){
+        setNotification({ open: true, type: 'success', data: { title: 'Creando Archivos', message: 'Espere un momento por favor' }})
+
+        reset()
+        setFiles([])
+
+      }
+    }, [TrainCreated])
+
+    const formatModels = (Allmodels: OpenAIModel[]) => {
       const optionModels: {label: string, value: string}[] = []
-      models.forEach((model) => {
+      Allmodels.forEach((model) => {
         if(model.id.includes('gpt-')){
           optionModels.push({
             label: model.id,
@@ -58,13 +78,13 @@ export default function CreateFileTraining(){
 
     const FormSchema = z.object({
       modelGeneratorData: z.string(requiredString)
-        .min(3, { message: "Los nombres debe tener mas de 3 caracteres" }),
+        .min(5, { message: "You must select an AI model from the list" }),
       name: z.string(requiredString)
-        .min(3, { message: "Los apellidos debe tener mas de 3 caracteres" }),
+        .min(3, { message: "The name of the file to be created is required" }),
       type_answer: z.string(requiredNumber)
-        .min(5, { message: "La Cedula esta incompleta" }),
+        .min(5, { message: "Choose a type of response you are looking for" }),
       role_system: z.string(requiredString)
-        .min(3, { message: "El nombre de la Empresa debe tener mas de 3 caracteres" }),
+        .min(3, { message: "The role of the system is required to enroll the AI ​​around its functions" }),
     })
 
     const defaultValues = {
@@ -76,16 +96,16 @@ export default function CreateFileTraining(){
 
     const optionsAnswer: { label: string, value: string }[] = [
       {
-      label: 'All: The AI defines length and tokens of responses.',
-      value: 'alls'
+        label: 'All: The AI defines length and tokens of responses.',
+        value: 'alls'
       },
       {
-      label: 'Short: Reduced and concise responses.',
-      value: 'short'
+        label: 'Short: Reduced and concise responses.',
+        value: 'short'
       },
       {
-      label: 'Long: Extensive and well-explained responses.',
-      value: 'long_explained'
+        label: 'Long: Extensive and well-explained responses.',
+        value: 'long_explained'
       }
     ]
 
@@ -99,37 +119,30 @@ export default function CreateFileTraining(){
       defaultValues
   })
 
-  function submitForm(event: any) {
-    console.log('event form ', event )
-    // const form = new FormData();
-    // form.append('nombres', event.nombres);
-    // form.append('apellidos', event.apellidos);
-    // form.append('cedula', event.cedula);
-    // form.append('nombreEmpresa', event.nombreEmpresa);
-    // form.append('nit', event.nit);
-    // form.append('celular', event.celular);
-    // form.append('telefono', event.telefono);
-    // form.append('direccion', event.direccion);
-    // form.append('ciudad', event.ciudad);
-    // form.append('departamento', event.departamento);
-    // form.append('email', event.email);
+  function submitForm(payload: any) {
+    console.log('event form ', payload )
 
-    // form.append('vendeExcel', event.vendeExcel);
-    // form.append('outsourcing', event.outsourcing);
-    // form.append('especialista', event.especialista);
-    // form.append('docente', event.docente);
-    // form.append('representaCentroEducativo', event.representaCentroEducativo);
-    // form.append('estaNegocio', event.estaNegocio);
+      const headers = new Headers()
+      const formData = new FormData()
 
-    // form.append('nroExcel', event.nroExcel);
-    // form.append('nroClientes', event.nroClientes);
-    // form.append('enteroColduty', event.enteroColduty);
+      headers.append("Accept", "*/*");
 
-    //sendData
+      formData.append('name', payload.name)
+      formData.append('role_system', payload.role_system)
+      formData.append('type_answer', payload.type_answer)
+      formData.append('modelGeneratorData', payload.modelGeneratorData)
+      formData.append('openAiKey', `${process.env.NEXT_PUBLIC_OPENAI_TOKEN}`)
 
+      console.log('files = ', files)
+
+      files.forEach(file => formData.append('files', file, file.name));
+
+      console.log('formData antes = ', formData)
+      createTrain(formData)
 }
 
-if(isLoading){
+
+if(isLoading && !modelsAI){
   return(
     <div className="max-w-[85rem] px-4 py-4 sm:px-6 lg:px-8 lg:py-4 mx-auto grid md:grid-cols-2 items-center gap-12">
 
@@ -187,7 +200,7 @@ if(isLoading){
           placeholder="Select an option"
           id="modelGeneratorData"
           name="modelGeneratorData"
-          options={isSuccess ? formatModels() : []}
+          options={isSuccess ? formatModels(modelsAI.data) : []}
           registerZod={register}
           errorMessage={errors.modelGeneratorData ? errors.modelGeneratorData?.message : ''}
           require={true}
@@ -215,7 +228,7 @@ if(isLoading){
           require={true}
         />
   
-        <InputText 
+        <InputTextarea
           label="System Role for AI" 
           placeholder="You are a salesperson, you advise people and companies on how to insure their possessions and people, you are attentive and very friendly."
           id="role_system" 
@@ -233,10 +246,8 @@ if(isLoading){
         </form>
       </div>
       </div>
+    < ModalNotification modal={notification} />
     </div>
   )
 }
-
-   
-
 }

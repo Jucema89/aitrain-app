@@ -1,3 +1,5 @@
+import { OpenAIModel } from "./openai.interfaces"
+
 export interface Training {
     id: string       
     files: FileTraining[] | File[]
@@ -14,7 +16,7 @@ export interface Training {
 }
 
 export type StatusFileTrain = 'start' | 'running' | 'finish' | 'cancel' | 'cancel_with_error'
-export type TrainingCreate = Omit<Training, 'id' | 'createdAt' | 'updatedAt'> 
+export type TrainingCreate = Omit<Training, 'id' | 'createdAt' | 'status' | 'observations' | 'updatedAt'> 
 export type TypeAnswer = 'alls' | 'short' | 'long_explained'
 export interface FileTraining {
     id :string                
@@ -35,15 +37,8 @@ export interface TrainingResponse {
 
 export interface OpenAiModelsResponse {
     success: boolean
-    data: ModelsOpenAI[]
+    data: OpenAIModel[]
     message?: string
-}
-
-export interface ModelsOpenAI {
-    id: string
-    object: string
-    created: number
-    owned_by: string
 }
 
 export interface ConfigurationEnv {

@@ -1,5 +1,5 @@
 import DateFormat from "@/app/utils/date"
-import { FileTraining, Training } from "../file-training.interface"
+import { FileTraining, Training } from "../../redux/interfaces/file-training.interface"
 
 export default function ListFileTraining(){
 

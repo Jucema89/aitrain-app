@@ -36,6 +36,7 @@ export default function Dropzone({addFileToForm}: { addFileToForm: Dispatch<SetS
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             const fileList = Array.from(e.dataTransfer.files);
             setFiles((prevState) => [...prevState, ...fileList]);
+            addFileToForm((prevState) => [...prevState, ...fileList])
         }
     }
 
@@ -60,7 +61,8 @@ export default function Dropzone({addFileToForm}: { addFileToForm: Dispatch<SetS
     function removeFile(idx: number) {
         const newArr = [...files];
         newArr.splice(idx, 1);
-        setFiles(newArr);
+        setFiles(newArr)
+        addFileToForm(newArr)
     }
 
     function openFileExplorer() {
@@ -88,7 +90,7 @@ export default function Dropzone({addFileToForm}: { addFileToForm: Dispatch<SetS
                     type="file"
                     multiple={true}
                     onChange={handleChange}
-                    accept=".xlsx,.xls,image/*,.doc, .docx,.ppt, .pptx,.txt,.pdf"
+                    accept={extensionValid.map(ext => `.${ext}`).join(',')}
                 />
                 <p>Arrastra y suelta tus archivos aquí</p>
 

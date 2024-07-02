@@ -1,9 +1,16 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+'use client'
+import { useEffect } from "react";
+import { useAppDispatch } from "./redux/hooks";
+import { useGetModelsMutation } from "./redux/service/openaiApi";
+import { addModels } from "./redux/features/openaiModels.slice";
 
 export default function Home({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
 

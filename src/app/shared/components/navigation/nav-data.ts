@@ -18,40 +18,40 @@ export const NAV_ROUTES: RoutesProps[] = [
     },
     {
         id: 2,
-        name: 'AI Training',
-        url: '/ai-training',
-        icon: SvgAiSparks,
+        name: 'File Training',
+        url: '/file-training',
+        icon: SvgFolder,
         routes: [
             {
                 id: 2.1,
-                name: 'Create Training',
-                url: '/ai-training/create',
+                name: 'Create Files',
+                url: '/file-training/create',
                 icon: SvgFolder,
             },
             {
                 id: 2.2,
-                name: 'List Training',
-                url: '/ai-training/list',
+                name: 'List Files',
+                url: '/file-training/list',
                 icon: SvgFolder,
             }
         ]
     },
     {
         id: 3,
-        name: 'File Training',
-        url: '/file-training',
-        icon: SvgFolder,
+        name: 'AI Training',
+        url: '/ai-training',
+        icon: SvgAiSparks,
         routes: [
             {
                 id: 3.1,
-                name: 'Create Files',
-                url: '/file-training/create',
+                name: 'Create Training',
+                url: '/ai-training/create',
                 icon: SvgFolder,
             },
             {
                 id: 3.2,
-                name: 'List Files',
-                url: '/file-training/list',
+                name: 'List Training',
+                url: '/ai-training/list',
                 icon: SvgFolder,
             }
         ]
