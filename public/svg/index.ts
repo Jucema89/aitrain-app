@@ -7,3 +7,4 @@ export { default as SvgFolder } from './folder.svg'
 export { default as SvgChatAi } from './chat_ai.svg'
 export { default as SvgSetting } from './settings.svg'
 export { default as SvgStats } from './stats.svg'
+ 

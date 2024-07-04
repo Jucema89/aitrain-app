@@ -1,14 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Roboto } from "next/font/google";
+
 import "./globals.css";
 import PrelineScript from "./shared/components/PrelineScript";
 import { SvgAitrainLogoPC, SvgAitrainLogoPhone } from "../../public/svg";
 import Navigation from "./shared/components/navigation/navigation";
 import Header from "./shared/components/header.component";
 import StoreProvider from "./StoreProvider";
+import { NotificationProvider } from "./shared/hooks/NotificationContext";
 
-const inter = Inter({ subsets: ["latin"] });
+//const inter = Inter({ subsets: ["latin"] });
+const roboto = Roboto({ weight: '400', subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Aitrain | Train AI easy",
@@ -22,16 +25,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={roboto.className}>
         <Header />
         <Navigation />
         <div className="w-full lg:ps-64">
           <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-            <StoreProvider>{ children }</StoreProvider>
+          <NotificationProvider>
+            <StoreProvider>
+              { children }
+              <PrelineScript />
+            </StoreProvider>
+          </NotificationProvider>
           </div>
         </div>
       </body>
-      <PrelineScript />
+
     </html>
   )
 }

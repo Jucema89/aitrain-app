@@ -17,9 +17,12 @@ export interface OpenaiFinetuningCreated {
     id: string
     model: string
     created_at: number
+    finished_at: number
     fine_tuned_model: string | null
     organization_id: string
     result_files: any[]
+    trained_tokens: number
+    user_provided_suffix: string
     status: string
     validation_file: string
     training_file: string
@@ -27,7 +30,7 @@ export interface OpenaiFinetuningCreated {
 
 export interface OpenaiFinetuningResponse {
     success: boolean
-    data: OpenaiFinetuningCreated
+    data: OpenaiFinetuningCreated[]
     message?: string
 }
 

@@ -10,7 +10,7 @@ export const finetunningApi = createApi({
         baseUrl: `${urlBack}/api/openai/finetuning` 
     }),
     endpoints: (builder) => ({
-        getFinetuning: builder.query<OpenaiFinetuningResponse, string>({
+        getFinetuning: builder.query<OpenaiFinetuningResponse, void>({
             query: () => ({
                 url: `/alls/${apiKey}`,
                 method: 'GET'

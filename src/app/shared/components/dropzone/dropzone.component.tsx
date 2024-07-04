@@ -1,10 +1,15 @@
-import { useRef, useState, ChangeEvent, DragEvent, Dispatch, SetStateAction } from "react";
+import { useRef, useState, ChangeEvent, DragEvent, Dispatch, SetStateAction, useEffect } from "react";
 import DropzoneFile from "./dropzone-file.component";
 
-export default function Dropzone({addFileToForm}: { addFileToForm: Dispatch<SetStateAction<File[]>> }) {
+export default function Dropzone({addFileToForm, clearFiles }: { addFileToForm: Dispatch<SetStateAction<File[]>>, clearFiles: boolean }) {
+
     const [dragActive, setDragActive] = useState<boolean>(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const [files, setFiles] = useState<File[]>([]);
+
+    useEffect(() => {
+        if(clearFiles) setFiles([])
+    }, [clearFiles])
 
     const extensionValid: string[] = [
         'txt', 'docx', 'doc', 'pdf', 'PDF', 'xls', 'xlsx', 'ppt', 'pptx'

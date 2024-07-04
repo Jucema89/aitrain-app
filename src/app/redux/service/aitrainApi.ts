@@ -10,7 +10,7 @@ export const aitrainApi = createApi({
         baseUrl: `${urlBack}/api/train` 
     }),
     endpoints: (builder) => ({
-        getTrains: builder.query<TrainingResponse, string>({
+        getTrains: builder.query<TrainingResponse, void>({
             query: () => ({
                 url: '/alls',
                 method: 'GET'
