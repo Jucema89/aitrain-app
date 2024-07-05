@@ -1,62 +1,33 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 import * as z from 'zod';
-import { useGetModelsMutation } from '@/app/redux/service/openaiApi';
-import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod'
 import InputText from '@/app/shared/form/input-text';
 import InputSelect from '@/app/shared/form/input-select';
 import { useEffect, useState } from 'react';
-import { addModels } from '@/app/redux/features/openaiModels.slice';
 import Dropzone from '@/app/shared/components/dropzone/dropzone.component';
 import InputTextarea from '@/app/shared/form/input-textarea';
-import { OpenAIModel } from '@/app/redux/interfaces/openai.interfaces';
-import { useCreateTrainMutation } from '@/app/redux/service/trainingDocsApi';
-import { Training } from '@/app/redux/interfaces/file-training.interface';
+import { OpenAIModel } from '@/app/interfaces/openai.interfaces';
 import { useNotification } from '@/app/shared/hooks/NotificationContext';
+import { getModelsOpenai } from '@/app/service/openaiApi';
+import { createTrain } from '@/app/service/trainingDocsApi';
 
 
 export default function CreateFileTraining(){
-    const dispatch = useAppDispatch()
     const { showNotification } = useNotification();
-
+    const [loading, setLoading] = useState<boolean>(true)
     const [files, setFiles] = useState<File[]>([]);
     const [ forceClearFiles, setForceClearFiles ] = useState<boolean>(false)
+    const [ models, setModels ] = useState<OpenAIModel[]>([])
 
-    const models = useAppSelector(state => state.openAIModelsReducer.models)
-
-    const [getModels, { data: modelsAI, isLoading, isSuccess, isError, error }] = useGetModelsMutation();
-
-    const [createTrain, { data: TrainCreated }] = useCreateTrainMutation()
-
-    //effect in start App
     useEffect(() => {
-      getModels();
-      if(isSuccess && modelsAI){
-        dispatch(addModels(modelsAI.data))
-      }
-    }, [dispatch]);
+      getModelsOpenai().then((models) => {
+        setModels(models)
+        setLoading(false)
+      })
 
-    //Effect after send Form create training
-    useEffect(() => {
-
-      if (typeof window !== "undefined" && modelsAI && TrainCreated){
-
-        const trainCreated: Training = typeof(TrainCreated.data) === 'object' ? TrainCreated.data as Training : (TrainCreated.data[0] as Training)
-
-        showNotification ({ 
-          message: `Trainer Doc has been created in our database, the training files are being created, this may take a few minutes depending on the size and number of files.`, 
-          type: 'success', 
-          open: true, 
-          time: 5200
-        })
-
-        reset()
-        setForceClearFiles(true)
-        setFiles([])
-      }
-    }, [TrainCreated])
+    }, []);
 
     const formatModels = (Allmodels: OpenAIModel[]) => {
       const optionModels: {label: string, value: string}[] = []
@@ -148,11 +119,24 @@ export default function CreateFileTraining(){
     files.forEach(file => formData.append('files', file, file.name));
 
     console.log('formData antes = ', formData)
-    createTrain(formData)
+    if(formData){
+      createTrain(formData).then((response) => {  
+        if(response.success){
+          showNotification ({ 
+            message: `Trainer Doc has been created in our database, the training files are being created, this may take a few minutes depending on the size and number of files.`, 
+            type: 'success', 
+            open: true, 
+            time: 5200
+          })
+            reset()
+            setForceClearFiles(true)
+            setFiles([])
+          }
+      })
+    }
   }
 
-
-  if(isLoading && !modelsAI){
+  if(!loading && !models){
     return(
       <div className="max-w-[85rem] px-4 py-4 sm:px-6 lg:px-8 lg:py-4 mx-auto grid md:grid-cols-2 items-center gap-12">
 
@@ -210,7 +194,7 @@ export default function CreateFileTraining(){
             placeholder="Select an option"
             id="modelGeneratorData"
             name="modelGeneratorData"
-            options={isSuccess ? formatModels(models) : []}
+            options={ formatModels(models)}
             registerZod={register}
             errorMessage={errors.modelGeneratorData ? errors.modelGeneratorData?.message : ''}
             require={true}
