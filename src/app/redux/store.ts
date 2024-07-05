@@ -5,7 +5,7 @@ import openAIModelsReducer from './features/openaiModels.slice'
 import trainingDocsReducer from './features/trainingDocs.slice'
 import finetunningJobsReducer from './features/finetuningJobs.slice'
 
-import { aitrainApi } from './service/aitrainApi'
+import { trainingDocsApi } from './service/trainingDocsApi'
 import { openaiApi } from './service/openaiApi'
 import { finetunningApi } from './service/finetunningApi'
 
@@ -15,14 +15,14 @@ export const makeStore = () => {
                 openAIModelsReducer,
                 [openaiApi.reducerPath]: openaiApi.reducer,
                 trainingDocsReducer,
-                [aitrainApi.reducerPath]: aitrainApi.reducer,
+                [trainingDocsApi.reducerPath]: trainingDocsApi.reducer,
                 finetunningJobsReducer,
                 [finetunningApi.reducerPath]: finetunningApi.reducer
         },
         middleware: (getDefaultMiddleware) => 
             getDefaultMiddleware().concat([
                 openaiApi.middleware,
-                aitrainApi.middleware,
+                trainingDocsApi.middleware,
                 finetunningApi.middleware
             ])
     })

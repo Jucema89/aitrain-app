@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 import { useEffect } from "react";
-import { useAppDispatch } from "./redux/hooks";
+import { useAppDispatch } from "./redux/hooks"; 
 import { useGetModelsMutation } from "./redux/service/openaiApi";
 import { addModels } from "./redux/features/openaiModels.slice";
 
@@ -24,7 +24,7 @@ export default function Home({
 
             <div className="grow">
               <div className="flex items-center gap-x-2">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-neutral-500">
+                <p className="text-xs uppercase tracking-wide text-gray-500  dark:text-neutral-500">
                   Total users
                 </p>
                 <div className="hs-tooltip">

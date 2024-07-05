@@ -12,7 +12,7 @@ import { addModels } from '@/app/redux/features/openaiModels.slice';
 import Dropzone from '@/app/shared/components/dropzone/dropzone.component';
 import InputTextarea from '@/app/shared/form/input-textarea';
 import { OpenAIModel } from '@/app/redux/interfaces/openai.interfaces';
-import { useCreateTrainMutation } from '@/app/redux/service/aitrainApi';
+import { useCreateTrainMutation } from '@/app/redux/service/trainingDocsApi';
 import { Training } from '@/app/redux/interfaces/file-training.interface';
 import { useNotification } from '@/app/shared/hooks/NotificationContext';
 

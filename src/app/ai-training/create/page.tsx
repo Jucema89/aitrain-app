@@ -7,7 +7,7 @@ import { OpenAIModel } from '@/app/redux/interfaces/openai.interfaces';
 import { useCreateFinetuningMutation } from '@/app/redux/service/finetunningApi';
 import InputSelect from '@/app/shared/form/input-select';
 import InputText from '@/app/shared/form/input-text';
-import { useGetTrainsQuery } from '@/app/redux/service/aitrainApi';
+import { useGetTrainsQuery } from '@/app/redux/service/trainingDocsApi';
 import { useEffect } from 'react';
 import { Training } from '@/app/redux/interfaces/file-training.interface';
 

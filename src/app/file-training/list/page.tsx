@@ -1,7 +1,7 @@
 'use client'
 import { DateFormat } from "@/app/utils/date"
 import { FileTraining, StatusFileTrain, Training } from "../../redux/interfaces/file-training.interface"
-import { useGetTrainsQuery } from "@/app/redux/service/aitrainApi";
+import { useGetTrainsQuery } from "@/app/redux/service/trainingDocsApi";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/redux/hooks";
 import { addTraining } from "@/app/redux/features/trainingDocs.slice";

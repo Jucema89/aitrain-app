@@ -4,8 +4,8 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const urlBack = `${process.env.NEXT_PUBLIC_API_URL}`;
 
-export const aitrainApi = createApi({
-    reducerPath: 'aitrainApi',
+export const trainingDocsApi = createApi({
+    reducerPath: 'trainingDocsApi',
     baseQuery: fetchBaseQuery({ 
         baseUrl: `${urlBack}/api/train` 
     }),
@@ -39,4 +39,4 @@ export const aitrainApi = createApi({
     })
 })
 
-export const { useCreateTrainMutation, useGetOneTrainQuery, useGetTrainsQuery, use_deleteOneTrainMutation } = aitrainApi
+export const { useCreateTrainMutation, useGetOneTrainQuery, useGetTrainsQuery, use_deleteOneTrainMutation } = trainingDocsApi
