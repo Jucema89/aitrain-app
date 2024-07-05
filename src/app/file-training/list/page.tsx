@@ -1,17 +1,13 @@
 'use client'
 import { DateFormat } from "@/app/utils/date"
-import { FileTraining, StatusFileTrain, Training } from "../../redux/interfaces/file-training.interface"
-import { useGetTrainsQuery } from "@/app/redux/service/trainingDocsApi";
+import { FileTraining, StatusFileTrain, Training } from "../../interfaces/file-training.interface"
 import { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/app/redux/hooks";
-import { addTraining } from "@/app/redux/features/trainingDocs.slice";
 import Link from "next/link";
 import BadgeStatus, { BadgeStatusProps } from "@/app/shared/components/badge-status";
-import { FinetunedStatus } from "@/app/redux/interfaces/openai.interfaces";
+import { FinetunedStatus } from "@/app/interfaces/openai.interfaces";
+import { getTrains } from "@/app/service/trainingDocsApi";
 
 export default function ListFileTraining(){
-  const dispatch = useAppDispatch()
-  const { data: filesTraining, isLoading, isSuccess, isError, error } = useGetTrainsQuery();
 
     const tableHeader: string[] = [
         'Nombre',
@@ -23,16 +19,15 @@ export default function ListFileTraining(){
         ''
     ]
 
-    const trains = useAppSelector(state => state.trainingDocsReducer.trains)
-
     const [trainings, setTrainings] = useState<Training[]>([])
+    const [isLoading, setIsLoading] = useState<boolean>(true)
 
     useEffect(() => {
-      if(filesTraining){
-        setTrainings(filesTraining.data as Training[])
-        dispatch(addTraining(filesTraining.data))
-      }
-    }, [filesTraining, dispatch])
+        getTrains().then((trains) => {
+            setTrainings(trains)
+            setIsLoading(false)
+        })
+    }, [])
 
     function getFiles(files: FileTraining[] | File[]): FileTraining[]{
       const ableFiles = files as FileTraining[]
@@ -120,7 +115,7 @@ export default function ListFileTraining(){
 
               <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
 
-              { trains.map((train, i) => (
+              { trainings.map((train, i) => (
                   <tr key={i}>
                   <td className="size-px whitespace-nowrap">
                     <div className="px-6 py-3">

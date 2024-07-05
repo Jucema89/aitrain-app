@@ -1,18 +1,23 @@
 'use client'
 import  { DateFromTimestamp } from "@/app/utils/date"
-import { FileTraining, StatusFileTrain, Training } from "../../redux/interfaces/file-training.interface"
+import { FileTraining, StatusFileTrain, Training } from "../../interfaces/file-training.interface"
 import { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/app/redux/hooks";
-import { addTraining } from "@/app/redux/features/trainingDocs.slice";
 import Link from "next/link";
 import BadgeStatus, { BadgeStatusProps } from "@/app/shared/components/badge-status";
-import { FinetunedStatus, OpenaiFinetuningCreated } from "@/app/redux/interfaces/openai.interfaces";
-import { useGetFinetuningQuery } from "@/app/redux/service/finetunningApi";
-import { addFinetuningJob } from "@/app/redux/features/finetuningJobs.slice";
+import { FinetunedStatus, OpenaiFinetuningCreated } from "@/app/interfaces/openai.interfaces";
+import { getFinetuning } from "@/app/service/finetunningApi";
+
 
 export default function ListAITraining(){
-  const dispatch = useAppDispatch()
-  const { data: finetunningData, isLoading, isSuccess, isError, error } = useGetFinetuningQuery();
+  const [ finetunning, setFinetunning ] = useState<OpenaiFinetuningCreated[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    getFinetuning().then((finetunning) => {
+      setFinetunning(finetunning)
+      setLoading(false)
+    })
+  })
 
     const tableHeader: string[] = [
         'Nombre',
@@ -23,17 +28,6 @@ export default function ListAITraining(){
         'Creado',
         ''
     ]
-
-    const finetunnings = useAppSelector(state => state.finetunningJobsReducer.jobs)
-
-    const [finetuneds, setFinetuneds] = useState<OpenaiFinetuningCreated[]>([])
-
-    useEffect(() => {
-      if(finetunningData){
-        //setFinetuneds(finetunningData.data)
-        dispatch(addFinetuningJob(finetunningData.data))
-      }
-    }, [finetunningData, dispatch])
 
     // function getFiles(files: FileTraining[] | File[]): FileTraining[]{
     //   const ableFiles = files as FileTraining[]
@@ -69,7 +63,7 @@ export default function ListAITraining(){
     }
   
     
-    if(isLoading && !finetunnings){
+    if(loading && !finetunning){
       return (<div>Cargando...</div>)
     }    
     
@@ -121,7 +115,7 @@ export default function ListAITraining(){
 
               <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
 
-              { finetunningData?.data.map((tunned, i) => (
+              { finetunning.map((tunned, i) => (
                   <tr key={i}>
                   <td className="size-px whitespace-nowrap">
                     <div className="px-6 py-3">
@@ -228,7 +222,7 @@ export default function ListAITraining(){
               <div>
                 <p className="text-sm text-gray-600 dark:text-neutral-400">
                   <span className="font-semibold text-gray-800 dark:text-neutral-200">
-                    { finetunnings.length }
+                    { finetunning.length }
                   </span> resultados
                 </p>
               </div>

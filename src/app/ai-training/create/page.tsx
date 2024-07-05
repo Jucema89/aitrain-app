@@ -2,30 +2,39 @@
 import * as z from 'zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useAppDispatch, useAppSelector } from '@/app/redux/hooks';
-import { OpenAIModel } from '@/app/redux/interfaces/openai.interfaces';
-import { useCreateFinetuningMutation } from '@/app/redux/service/finetunningApi';
+import { OpenAIModel } from '@/app/interfaces/openai.interfaces';
 import InputSelect from '@/app/shared/form/input-select';
 import InputText from '@/app/shared/form/input-text';
-import { useGetTrainsQuery } from '@/app/redux/service/trainingDocsApi';
-import { useEffect } from 'react';
-import { Training } from '@/app/redux/interfaces/file-training.interface';
+import { useEffect, useState } from 'react';
+import { Training } from '@/app/interfaces/file-training.interface';
+import { getModelsOpenai } from '@/app/service/openaiApi';
+import { getTrains } from '@/app/service/trainingDocsApi';
+import { set } from 'date-fns';
+import { createFinetuning } from '@/app/service/finetunningApi';
+import { useNotification } from '@/app/shared/hooks/NotificationContext';
 
 
 export default function CreateAITraining(){
+  const { showNotification } = useNotification();
 
-    const dispatch = useAppDispatch()
+  const [ models, setModels ] = useState<OpenAIModel[]>([])
+  const [ trainsList, setTrainsList ] = useState<Training[]>([])
+  const [ isLoading, setLoading ] = useState<boolean>(true)
 
-    const models = useAppSelector(state => state.openAIModelsReducer.models)
-  
-    const trainsList = useAppSelector(state => state.trainingDocsReducer.trains)
-    const { data: trainings } = useGetTrainsQuery()
+    useEffect(() => {
+      fetchingData()
+    }, [])
 
-    const [createFinetinning, { data: FinetunedData, isLoading, isSuccess }] = useCreateFinetuningMutation()
+    const fetchingData = async () => {
+      const resTrains = await getTrains()
+      const resModels = await getModelsOpenai()
 
-    // useEffect(() => {   
-
-    // }, [dispatch])
+      if(resModels && resTrains){
+        setModels(resModels)
+        setTrainsList(resTrains)
+        setLoading(false)
+      }
+    }
 
     const requiredString = {
         required_error: "Este campo es Requerido",
@@ -86,7 +95,7 @@ export default function CreateAITraining(){
         return optionModels
       }
 
-      function submitForm(payload: {
+      async function submitForm(payload: {
         idDoc: string;
         name: string;
         model: string
@@ -96,10 +105,20 @@ export default function CreateAITraining(){
             apiKey: `${process.env.NEXT_PUBLIC_OPENAI_TOKEN}`
         }
 
-        createFinetinning(form)
+        if(form){
+          const response = await createFinetuning(form)
+          if(response.success){
+            showNotification({
+              message: 'The finetunning was created successfully!',
+              type: 'success',
+              open: true, 
+              time: 5200
+            })
+          }
+        }
       }
       
-      if(isLoading && !FinetunedData){
+      if(isLoading && models.length === 0 && trainsList.length === 0){
         return(
           <div className="max-w-[85rem] px-4 py-4 sm:px-6 lg:px-8 lg:py-4 mx-auto">
     
@@ -147,7 +166,7 @@ export default function CreateAITraining(){
                 placeholder="Select an option"
                 id="model"
                 name="model"
-                options={isSuccess ? formatModels(models) : []}
+                options={formatModels(models)}
                 registerZod={register}
                 errorMessage={errors.model ? errors.model?.message : ''}
                 require={true}
@@ -158,7 +177,7 @@ export default function CreateAITraining(){
                 placeholder="Select an option"
                 id="idDoc"
                 name="idDoc"
-                options={isSuccess ? formatTrainings(trainsList) : []}
+                options={formatTrainings(trainsList)}
                 registerZod={register}
                 errorMessage={errors.model ? errors.model?.message : ''}
                 require={true}
