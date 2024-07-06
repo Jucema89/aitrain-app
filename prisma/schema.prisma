@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model TrainDocs {
+  id                     String               @id @default(uuid())
+  files                  File[]
+  tokens_usage           Int                  @default(0)
+  name                   String
+  status                 StatusFileTrain      @default(start)
+  role_system            String               @default("")
+  modelGeneratorData     String               @default("")
+  openAiKey              String
+  type_answer            TypeAnswer
+  observations           String               @default("")
+  questions              TrainQuestions[]
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+}
+
+model TrainQuestions {
+  id                     String               @id @default(uuid())
+  trainId                String
+  train                  TrainDocs            @relation(fields: [trainId], references: [id], onDelete: Cascade)
+  questionsAndAnswer     QuestionAnswer[]
+}
+
+model QuestionAnswer {
+  id                     String               @id @default(uuid())
+  trainQuestionId        String
+  trainQuestion          TrainQuestions       @relation(fields: [trainQuestionId], references: [id], onDelete: Cascade )
+  question               String
+  answer                 String
+}
+
+model File {
+  id                     String               @id @default(uuid())
+  train                  TrainDocs            @relation(fields: [trainId], references: [id], onDelete: Cascade)
+  trainId                String
+  fieldName              String
+  extension              String
+  typeFileInTrain        TypeFileTrain
+  name                   String
+  link                   String
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+}
+
+enum TypeFileTrain {
+  base  //files charged
+  final //files created in training
+}
+
+
+enum StatusFileTrain {
+  start
+  running
+  finish
+  cancel
+  cancel_with_error
+}
+enum TypeAnswer {
+  alls
+  short
+  long_explained
+}
+
+enum TypeFile {
+  excel
+  application
+  pdf
+  word
+  image
+  video
+  audio
+  presentation
+  other
+}
